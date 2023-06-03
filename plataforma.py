@@ -54,7 +54,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
 
     def jump(self):
-        self.vel.y = -15
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if hits:
+            self.vel.y = -15
 
 # DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
 
