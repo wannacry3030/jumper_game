@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import random
 
 pygame.init()
 vec = pygame.math.Vector2  # 2 é usado pra 2 dimensoes - 2D
@@ -79,6 +80,16 @@ class platform(pygame.sprite.Sprite):
     def move(self):
         pass
 
+    def plat_gen():
+        # so inicia se tiver - de 7 plataformas na tela
+        while len(platforms) < 7:
+            # cria uma largura aleatoria para novas plataformas
+            width = random.randrange(50, 100)
+            p = platform()
+            # cria e posiciona a plat acima da parte visivel da tela (aleatoriamente)
+            p.rect.center = (random.randrange(
+                0, WIDTH - width), random.randrange(-50, 0))
+
 
 PT1 = platform()
 P1 = Player()
@@ -111,6 +122,7 @@ while True:
             P1.pos.y += abs(P1.vel.y)
             for plat in platforms:
                 plat.rect.y += abs(P1.vel.y)
+                # atualizando as plataformas na tela, destruindo as plataformas que saem da visao
                 if plat.rect.top >= HEIGHT:
                     plat.kill()
 
