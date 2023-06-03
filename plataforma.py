@@ -111,6 +111,12 @@ platforms = pygame.sprite.Group()
 platforms.add(PT1)
 
 
+for x in range(random.randint(5, 6)):
+    pl = platform()
+    platforms.add(pl)
+    all_sprites.add(pl)
+
+
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -133,6 +139,7 @@ while True:
 
     displaysurface.fill((0, 0, 0))
     P1.update()
+    plat_gen()
 
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
@@ -140,8 +147,3 @@ while True:
 
         pygame.display.update()
         FramePerSec.tick(FPS)
-
-    for x in range(random.randint(5, 6)):
-        pl = platform()
-        platforms.add(pl)
-        all_sprites.add(pl)
