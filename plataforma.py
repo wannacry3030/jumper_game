@@ -84,6 +84,8 @@ class platform(pygame.sprite.Sprite):
         self.surf.fill((0, 255, 0))
         self.rect = self.surf.get_rect(center=(random.randint(0, WIDTH-10),
                                                random.randint(0, HEIGHT-30)))
+        self.moving = True
+        self.point = True
 
     def move(self):
         pass
@@ -123,6 +125,8 @@ P1 = Player()
 PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
 PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
+PT1.moving = False
+PT1.point = False
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
@@ -170,8 +174,8 @@ while True:
             pygame.quit()
             sys.exit
 
-    displaysurface.fill((0, 0, 0))
     plat_gen()
+    displaysurface.fill((0, 0, 0))
 
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
