@@ -109,3 +109,8 @@ while True:
 
         pygame.display.update()
         FramePerSec.tick(FPS)
+
+    for x in range(random.randint(5, 6)):
+        pl = platform()
+        platforms.add(pl)
+        all_sprites.add(pl)
