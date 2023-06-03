@@ -176,6 +176,9 @@ while True:
 
     plat_gen()
     displaysurface.fill((0, 0, 0))
+    f = pygame.font.SysFont("Verdana", 20)
+    g = f.render(str(P1.score), True, (123, 255, 0))
+    displaysurface.blit(g, (WIDTH/2, 10))
 
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
