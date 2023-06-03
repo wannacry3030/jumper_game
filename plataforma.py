@@ -13,6 +13,7 @@ FramePerSec = pygame.time.Clock()
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
+
 # definindo o movimento direita e esquerda
 
 
@@ -63,6 +64,12 @@ class platform(pygame.sprite.Sprite):
         self.surf.fill((255, 0, 0))
         self.rect = self.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
 
+    def update(self):
+        hits = pygame.sprite.spritecollide(P1, platforms, False)
+        if hits:
+            self.pos.y = hits[0].rect.top + 1
+            self.vel.y = 0
+
 
 PT1 = platform()
 P1 = Player()
@@ -72,7 +79,8 @@ P1 = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
-
+platforms = pygame.sprite.Group()
+platforms.add(PT1)
 
 while True:
     for event in pygame.event.get():
