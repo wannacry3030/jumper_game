@@ -16,7 +16,18 @@ FramePerSec = pygame.time.Clock()
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
-# criando as classes do player e das plataformas
+# definindo o movimento direita e esquerda
+
+
+def move(self):
+    self.acc = vec(0, 0)
+
+    pressed_keys = pygame.key.get_pressed()
+
+    if pressed_keys[K_LEFT]:
+        self.acc.x = -ACC
+    if pressed_keys[K_RIGHT]:
+        self.acc.x = ACC
 
 # DEFININDO O PROTAGONISTA
 
