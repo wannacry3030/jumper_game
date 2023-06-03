@@ -68,9 +68,10 @@ class platform(pygame.sprite.Sprite):
 
     def update(self):
         hits = pygame.sprite.spritecollide(P1, platforms, False)
-        if hits:
-            self.pos.y = hits[0].rect.top + 1
-            self.vel.y = 0
+        if P1.vel.y > 0:
+            if hits:
+                self.pos.y = hits[0].rect.top + 1
+                self.vel.y = 0
 
 
 PT1 = platform()
