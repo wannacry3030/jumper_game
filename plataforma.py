@@ -100,9 +100,12 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 P1.jump()
+
+        # checando a posição do P1 de acordo com a tela
         if P1.rect.top <= HEIGHT / 3:
             P1.pos.y += abs(P1.vel.y)
             for plat in platforms:
