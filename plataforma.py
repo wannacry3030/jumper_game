@@ -53,6 +53,8 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.midbottom = self.pos
 
+    def jump(self):
+        self.vel.y = -15
 
 # DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
 
@@ -87,6 +89,9 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                P1.jump()
 
     displaysurface.fill((0, 0, 0))
     P1.move()
