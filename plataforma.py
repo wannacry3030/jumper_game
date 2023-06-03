@@ -1,39 +1,36 @@
 import pygame
 from pygame.locals import *
-import random
 import sys
+import random
 
 pygame.init()
-vec = pygame.math.Vector2  # 2 é usado pra 2 dimensoes - 2D
+vec = pygame.math.Vector2
+
 HEIGHT = 450
 WIDTH = 400
 ACC = 0.5
 FRIC = -0.12
 FPS = 60
+
 FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
 
 
-# definindo o movimento direita e esquerda
-
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.surf = pygame.Surface((30, 30))
-        self.surf.fill((128, 255, 40))
+        self.surf.fill((255, 255, 0))
         self.rect = self.surf.get_rect()
 
-        # implemento o movimento do protagonista
-        self.pos = vec((10, 385))
+        self.pos = vec((10, 360))
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
 
     def move(self):
         self.acc = vec(0, 0.5)
-
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[K_LEFT]:
@@ -41,18 +38,14 @@ class Player(pygame.sprite.Sprite):
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC
 
-        # equação que usa fricção pra diminuir a vel do P1
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
-        # DEFININDO O PROTAGONISTA
 
-    # criando "screen warping", atravessar de um lado para o outro da tela
         if self.pos.x > WIDTH:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = WIDTH
-
         self.rect.midbottom = self.pos
 
     def jump(self):
@@ -64,10 +57,8 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(P1, platforms, False)
         if P1.vel.y > 0:
             if hits:
-                self.pos.y = hits[0].rect.top + 1
                 self.vel.y = 0
-
-# DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
+                self.pos.y = hits[0].rect.top + 1
 
 
 class platform(pygame.sprite.Sprite):
@@ -75,24 +66,21 @@ class platform(pygame.sprite.Sprite):
         super().__init__()
         self.surf = pygame.Surface((random.randint(50, 100), 12))
         self.surf.fill((0, 255, 0))
-        self.rect = self.surf.get_rect(
-            center=(random.randint(0, WIDTH-10), random.randint(0, HEIGHT-30)))
+        self.rect = self.surf.get_rect(center=(random.randint(0, WIDTH-10),
+                                               random.randint(0, HEIGHT-30)))
 
     def move(self):
         pass
 
-    def plat_gen():
-        # so inicia se tiver - de 7 plataformas na tela
-        while len(platforms) < 7:
-            # cria uma largura aleatoria para novas plataformas
-            width = random.randrange(50, 100)
-            p = platform()
-            # cria e posiciona a plat acima da parte visivel da tela (aleatoriamente)
-            p.rect.center = (random.randrange(
-                0, WIDTH - width), random.randrange(-50, 0))
 
-            platforms.add(p)
-            all_sprites.add(p)
+def plat_gen():
+    while len(platforms) < 7:
+        width = random.randrange(50, 100)
+        p = platform()
+        p.rect.center = (random.randrange(0, WIDTH - width),
+                         random.randrange(-50, 0))
+        platforms.add(p)
+        all_sprites.add(p)
 
 
 PT1 = platform()
@@ -102,14 +90,12 @@ PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
 PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
 
-# CRIANDO O LOOP PRINCIPAL E RENDERIZANDO OS JOGADORES NA TELA
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
 
 platforms = pygame.sprite.Group()
 platforms.add(PT1)
-
 
 for x in range(random.randint(5, 6)):
     pl = platform()
@@ -122,20 +108,16 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 P1.jump()
 
-        # checando a posição do P1 de acordo com a tela
-        if P1.rect.top <= HEIGHT / 3:
-            # atualizando a tela pra buscar a pos do P1
-            P1.pos.y += abs(P1.vel.y)
-            for plat in platforms:
-                plat.rect.y += abs(P1.vel.y)
-                # atualizando as plataformas na tela, destruindo as plataformas que saem da visao
-                if plat.rect.top >= HEIGHT:
-                    plat.kill()
+    if P1.rect.top <= HEIGHT / 3:
+        P1.pos.y += abs(P1.vel.y)
+        for plat in platforms:
+            plat.rect.y += abs(P1.vel.y)
+            if plat.rect.top >= HEIGHT:
+                plat.kill()
 
     displaysurface.fill((0, 0, 0))
     P1.update()
@@ -145,5 +127,5 @@ while True:
         displaysurface.blit(entity.surf, entity.rect)
         entity.move()
 
-        pygame.display.update()
-        FramePerSec.tick(FPS)
+    pygame.display.update()
+    FramePerSec.tick(FPS)
