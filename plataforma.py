@@ -71,8 +71,10 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(P1, platforms, False)
         if P1.vel.y > 0:
             if hits:
-                self.vel.y = 0
-                self.pos.y = hits[0].rect.top + 1
+                if self.pos.y < hits[0].rect.bottom:
+                    self.vel.y = 0
+                    self.pos.y = hits[0].rect.top + 1
+                    self.jumping = False
 
 
 class platform(pygame.sprite.Sprite):
@@ -87,12 +89,30 @@ class platform(pygame.sprite.Sprite):
         pass
 
 
+def check(platform, groupies):
+    if pygame.sprite.spritecollideany(platform, groupies):
+        return True
+    else:
+        for entity in groupies:
+            if entity == platform:
+                continue
+            if (abs(platform.rect.top - entity.rect.bottom) < 50) and (abs(platform.rect.bottom - entity.rect.top) < 50):
+                return True
+            C = False
+
+
 def plat_gen():
-    while len(platforms) < 7:
+    while len(platforms) < HARD:
         width = random.randrange(50, 100)
         p = platform()
-        p.rect.center = (random.randrange(0, WIDTH - width),
-                         random.randrange(-50, 0))
+        C = True
+
+        while C:
+            p = platform()
+            p.rect.center = (random.randrange(
+                0, WIDTH - width), random.randrange(-50, 0))
+            C = check(p, platforms)
+
         platforms.add(p)
         all_sprites.add(p)
 
