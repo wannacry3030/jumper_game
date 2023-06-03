@@ -18,13 +18,22 @@ pygame.display.set_caption("Game")
 
 # criando as classes do player e das plataformas
 
+# DEFININDO O PROTAGONISTA
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.surf = pygame.Surface((30, 30))
         self.surf.fill((128, 255, 40))
-        self.rect = self.surf.get_rect(center=(10, 420))
+        self.rect = self.surf.get_rect()
+
+        # implemento o movimento do protagonista
+        self.pos = vec((10, 385))
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+
+# DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
 
 
 class platform(pygame.sprite.Sprite):
@@ -38,20 +47,22 @@ class platform(pygame.sprite.Sprite):
 PT1 = platform()
 P1 = Player()
 
-# Loop principal
-running = True
-while running:
+
+# CRIANDO O LOOP PRINCIPAL E RENDERIZANDO OS JOGADORES NA TELA
+all_sprites = pygame.sprite.Group()
+all_sprites.add(PT1)
+all_sprites.add(P1)
+
+while True:
     for event in pygame.event.get():
         if event.type == QUIT:
-            running = False
-        elif event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                running = False
+            pygame.quit()
+            sys.exit()
 
-    displaysurface.fill((0, 0, 0))  # a superfície com a cor de fundo
+    displaysurface.fill((0, 0, 0))
 
-    displaysurface.blit(PT1.surf, PT1.rect)
-    displaysurface.blit(P1.surf, P1.rect)
+    for entity in all_sprites:
+        displaysurface.blit(entity.surf, entity.rect)
 
-    pygame.display.update()
-    FramePerSec.tick(FPS)
+        pygame.display.update()
+        FramePerSec.tick(FPS)
