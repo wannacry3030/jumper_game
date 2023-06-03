@@ -10,6 +10,7 @@ ACC = 0.5
 FRIC = -0.12
 FPS = 60
 
+
 FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -36,3 +37,21 @@ class platform(pygame.sprite.Sprite):
 
 PT1 = platform()
 P1 = Player()
+
+# Loop principal
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            running = False
+        elif event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                running = False
+
+    displaysurface.fill((0, 0, 0))  # a superfície com a cor de fundo
+
+    displaysurface.blit(PT1.surf, PT1.rect)
+    displaysurface.blit(P1.surf, P1.rect)
+
+    pygame.display.update()
+    FramePerSec.tick(FPS)
