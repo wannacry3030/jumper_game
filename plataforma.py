@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import random
+import sys
 
 pygame.init()
 vec = pygame.math.Vector2  # 2 é usado pra 2 dimensoes - 2D
@@ -90,6 +91,9 @@ class platform(pygame.sprite.Sprite):
             p.rect.center = (random.randrange(
                 0, WIDTH - width), random.randrange(-50, 0))
 
+            platforms.add(p)
+            all_sprites.add(p)
+
 
 PT1 = platform()
 P1 = Player()
@@ -105,6 +109,7 @@ all_sprites.add(P1)
 
 platforms = pygame.sprite.Group()
 platforms.add(PT1)
+
 
 while True:
     for event in pygame.event.get():
