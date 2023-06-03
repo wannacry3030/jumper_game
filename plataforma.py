@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import sys
 import random
+import time
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -154,6 +155,16 @@ while True:
             plat.rect.y += abs(P1.vel.y)
             if plat.rect.top >= HEIGHT:
                 plat.kill()
+
+    if P1.rect.top > HEIGHT:
+        for entity in all_sprites:
+            entity.kill()
+            time.sleep(1)
+            displaysurface.fill((255, 0, 0))
+            pygame.display.update()
+            time.sleep(1)
+            pygame.quit()
+            sys.exit
 
     displaysurface.fill((0, 0, 0))
     plat_gen()
