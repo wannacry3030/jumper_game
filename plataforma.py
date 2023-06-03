@@ -107,6 +107,7 @@ while True:
 
         # checando a posição do P1 de acordo com a tela
         if P1.rect.top <= HEIGHT / 3:
+            # atualizando a tela pra buscar a pos do P1
             P1.pos.y += abs(P1.vel.y)
             for plat in platforms:
                 plat.rect.y += abs(P1.vel.y)
