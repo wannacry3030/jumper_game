@@ -83,6 +83,9 @@ class platform(pygame.sprite.Sprite):
 PT1 = platform()
 P1 = Player()
 
+PT1.surf = pygame.Surface((WIDTH, 20))
+PT1.surf.fill((255, 0, 0))
+PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
 
 # CRIANDO O LOOP PRINCIPAL E RENDERIZANDO OS JOGADORES NA TELA
 all_sprites = pygame.sprite.Group()
@@ -100,6 +103,12 @@ while True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 P1.jump()
+        if P1.rect.top <= HEIGHT / 3:
+            P1.pos.y += abs(P1.vel.y)
+            for plat in platforms:
+                plat.rect.y += abs(P1.vel.y)
+                if plat.rect.top >= HEIGHT:
+                    plat.kill()
 
     displaysurface.fill((0, 0, 0))
     P1.update()
