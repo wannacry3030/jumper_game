@@ -29,7 +29,20 @@ def move(self):
     if pressed_keys[K_RIGHT]:
         self.acc.x = ACC
 
-# DEFININDO O PROTAGONISTA
+    # equação que usa fricção pra diminuir a vel do P1
+    self.acc.x += self.vel.x * FRIC
+    self.vel += self.acc
+    self.pos += self.vel + 0.5 * self.acc
+    # DEFININDO O PROTAGONISTA
+
+
+# criando "screen warping", atravessar de um lado para o outro da tela
+    if self.pos.x > WIDTH:
+        self.pos.x = 0
+    if self.pos.x < 0:
+        self.pos.x = WIDTH
+
+    self.rect.midbottom = self.pos
 
 
 class Player(pygame.sprite.Sprite):
@@ -43,6 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.pos = vec((10, 385))
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+
 
 # DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
 
