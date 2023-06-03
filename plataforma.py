@@ -58,6 +58,13 @@ class Player(pygame.sprite.Sprite):
         if hits:
             self.vel.y = -15
 
+    def update(self):
+        hits = pygame.sprite.spritecollide(P1, platforms, False)
+        if P1.vel.y > 0:
+            if hits:
+                self.pos.y = hits[0].rect.top + 1
+                self.vel.y = 0
+
 # DEFININDO AS PLATAFORMAS QUE SERAO UTILIZADAS DURANTE O JOGO
 
 
@@ -68,12 +75,8 @@ class platform(pygame.sprite.Sprite):
         self.surf.fill((255, 0, 0))
         self.rect = self.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
 
-    def update(self):
-        hits = pygame.sprite.spritecollide(P1, platforms, False)
-        if P1.vel.y > 0:
-            if hits:
-                self.pos.y = hits[0].rect.top + 1
-                self.vel.y = 0
+    def move(self):
+        pass
 
 
 PT1 = platform()
@@ -84,6 +87,7 @@ P1 = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
+
 platforms = pygame.sprite.Group()
 platforms.add(PT1)
 
@@ -97,9 +101,11 @@ while True:
                 P1.jump()
 
     displaysurface.fill((0, 0, 0))
-    P1.move()
+    P1.update()
+
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
+        entity.move()
 
         pygame.display.update()
         FramePerSec.tick(FPS)
