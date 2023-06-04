@@ -22,7 +22,7 @@ FPS = 60
 FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Game")
+pygame.display.set_caption("mago legal")
 
 
 class Player(pygame.sprite.Sprite):
