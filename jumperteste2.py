@@ -18,6 +18,7 @@ WIDTH = 400
 ACC = 0.5
 FRIC = -0.12
 FPS = 60
+game_over = False
 
 FramePerSec = pygame.time.Clock()
 
@@ -107,31 +108,29 @@ class Enemy(pygame.sprite.Sprite):
 
         # Set the initial x position on either the left or right side of the screen
         if random.choice([True, False]):
-            self.rect.centerx = random.randint(0, WIDTH // 2 - width // 2)
+            self.rect.left = 0
+            self.speed = random.randint(1, 3)
         else:
-            self.rect.centerx = random.randint(WIDTH // 2 + width // 2, WIDTH)
+            self.rect.right = WIDTH
+            self.speed = random.randint(-3, -1)
 
         self.rect.centery = random.randint(0, HEIGHT - 30)
 
         self.point = True
         self.moving = True
-        self.speed = random.randint(1, 3)
-
-        if random.choice([True, False]):
-            self.speed *= -1
 
     def move(self):
         hits = self.rect.colliderect(P1.rect)
         if self.moving:
             self.rect.move_ip(self.speed, 0)
             if hits:
+                global game_over
+                game_over = True
                 P1.pos.x += self.speed
             if self.speed > 0 and self.rect.left > WIDTH:
-                self.rect.right = 0
+                self.kill()  # Remove o morcego se estiver fora da tela à direita
             if self.speed < 0 and self.rect.right < 0:
-                self.rect.left = WIDTH
-            if self.rect.left > WIDTH or self.rect.right < 0:
-                self.kill()
+                self.kill()  # Remove o morcego se estiver fora da tela à esquerda
 
     def update_image(self):
         # Scale the image using the original dimensions
@@ -250,9 +249,9 @@ for x in range(random.randint(4, 5)):
 
 # Tempo inicial para o próximo spawn de inimigo
 enemy_spawn_time = pygame.time.get_ticks() + random.randint(2000, 5000)
+game_over = False
 
-
-while True:
+while not game_over:
     P1.update()
     E1.update()
     for event in pygame.event.get():
@@ -266,7 +265,14 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
+    if pygame.sprite.spritecollideany(P1, enemies):
+        game_over = True
+        P1.vel.y = 0  # Adicione esta linha para parar o movimento vertical do jogador
+
     if P1.rect.top > HEIGHT:
+        game_over = True
+
+    if game_over:
         for entity in all_sprites:
             entity.kill()
         time.sleep(1)
