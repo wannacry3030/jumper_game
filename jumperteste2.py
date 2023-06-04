@@ -4,6 +4,7 @@ import sys
 import random
 import time
 import pygame.mixer
+import imageio
 
 pygame.init()
 pygame.mixer.init()
@@ -101,7 +102,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, width=43, height=28):
         super().__init__()
 
-        self.original_image = pygame.image.load("bat.png")
+        self.original_image = pygame.image.load("batleft.gif")
         self.surf = pygame.transform.scale(
             self.original_image, (width, height))
         self.rect = self.surf.get_rect()
@@ -162,8 +163,8 @@ class Platform(pygame.sprite.Sprite):
 
         self.image = pygame.image.load("platform.png")
         self.surf = pygame.transform.scale(self.image, (width, height))
-        self.rect = self.surf.get_rect(center=(random.randint(0, WIDTH-10),
-                                               random.randint(0, HEIGHT-30)))
+        self.rect = self.surf.get_rect(
+            center=(random.randint(0, WIDTH-10), random.randint(0, HEIGHT-30)))
 
         self.point = True
         self.moving = True
@@ -208,8 +209,8 @@ def plat_gen():
 
         while C:
             p = Platform()
-            p.rect.center = (random.randrange(0, WIDTH - width),
-                             random.randrange(-50, 0))
+            p.rect.center = (random.randrange(
+                0, WIDTH - width), random.randrange(-50, 0))
             C = check(p, platforms)
 
         p.generateCoin()
