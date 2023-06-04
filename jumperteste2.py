@@ -3,7 +3,6 @@ from pygame.locals import *
 import sys
 import random
 import time
-import pygame.mixer
 
 pygame.init()
 pygame.mixer.init()
@@ -30,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.surf_left = pygame.image.load("snowman_left.png")
         self.surf_right = pygame.image.load("snowman_right.png")
-        self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
+        self.surf = self.surf_right
         self.rect = self.surf.get_rect()
 
         self.pos = vec((10, 360))
@@ -38,7 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.jumping = False
         self.score = 0
-        self.direction = "right"  # Inicialmente, o personagem está voltado para a direita
+        self.direction = "right"
 
     def move(self):
         self.acc = vec(0, 0.5)
@@ -47,11 +46,9 @@ class Player(pygame.sprite.Sprite):
 
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC
-            # Altera a direção para "left" quando a tecla "left" é pressionada
             self.direction = "left"
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC
-            # Altera a direção para "right" quando a tecla "right" é pressionada
             self.direction = "right"
 
         self.acc.x += self.vel.x * FRIC
@@ -101,33 +98,22 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.surf_left = pygame.image.load("enemy_left.png")
         self.surf_right = pygame.image.load("enemy_right.png")
-        self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
+        self.surf = self.surf_right
         self.rect = self.surf.get_rect()
 
-        self.pos = vec((WIDTH + 20, 360))
-        self.vel = vec(-1, 0)
-        self.direction = "left"  # Inicialmente, o inimigo está voltado para a esquerda
+        self.pos = vec((random.randint(0, WIDTH), -100))
+        self.vel = vec(0, 0)
 
     def move(self):
-        if self.direction == "left":
-            self.acc = vec(-ACC, 0)
-        elif self.direction == "right":
-            self.acc = vec(ACC, 0)
-
-        self.acc.x += self.vel.x * FRIC
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-
-        if self.pos.x < -20 or self.pos.x > WIDTH + 20:
-            self.kill()
+        self.vel.y = 5
+        self.pos += self.vel
+        if self.pos.y > HEIGHT:
+            self.pos.y = random.randint(-100, -10)
+            self.pos.x = random.randint(0, WIDTH)
 
         self.rect.midbottom = self.pos
 
     def draw(self):
-        if self.direction == "left":
-            self.surf = self.surf_left
-        elif self.direction == "right":
-            self.surf = self.surf_right
         displaysurface.blit(self.surf, self.rect)
 
 
@@ -181,7 +167,7 @@ class Platform(pygame.sprite.Sprite):
                 self.rect.left = WIDTH
 
 
-def check_collision(platform, groupies):
+def check(platform, groupies):
     if pygame.sprite.spritecollideany(platform, groupies):
         return True
     else:
@@ -193,17 +179,17 @@ def check_collision(platform, groupies):
         return False
 
 
-def generate_platform():
+def plat_gen():
     while len(platforms) < 6:
         width = random.randrange(50, 100)
         p = Platform()
-        collision = True
+        c = True
 
-        while collision:
+        while c:
             p = Platform()
             p.rect.center = (random.randrange(0, WIDTH - width),
                              random.randrange(-50, 0))
-            collision = check_collision(p, platforms)
+            c = check(p, platforms)
 
         p.generate_coin()
         platforms.add(p)
@@ -226,22 +212,23 @@ E1 = Enemy()
 
 all_sprites.add(PT1)
 all_sprites.add(P1)
-all_sprites.add(E1)
 platforms.add(PT1)
 
 for x in range(random.randint(4, 5)):
-    collision = True
+    c = True
     pl = Platform()
-    while collision:
+    while c:
         pl = Platform()
-        collision = check_collision(pl, platforms)
+        c = check(pl, platforms)
     pl.generate_coin()
     platforms.add(pl)
     all_sprites.add(pl)
 
+enemy_timer = pygame.time.get_ticks() + 5000  # Initial delay of 5 seconds
+
 while True:
     P1.update()
-    E1.move()
+
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -253,43 +240,61 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
-    if P1.rect.top > HEIGHT:
-        for entity in all_sprites:
-            entity.kill()
-        time.sleep(1)
-        displaysurface.fill((255, 0, 0))
+    if pygame.time.get_ticks() >= enemy_timer:
+        e = Enemy()
+        all_sprites.add(e)
+        enemy_timer += 5000
+
+    for entity in all_sprites:
+        displaysurface.blit(background, (0, 0))
+        entity.move()
+        displaysurface.blit(entity.surf, entity.rect)
+
+    if P1.jumping:
+        P1.surf = pygame.image.load("snowman_jump.png")
+    else:
+        if P1.direction == "left":
+            P1.surf = pygame.image.load("snowman_left.png")
+        elif P1.direction == "right":
+            P1.surf = pygame.image.load("snowman_right.png")
+
+    if P1.vel.y != 0:
+        P1.jumping = True
+    platforms.update()
+
+    coins.update()
+    coins.draw(displaysurface)
+
+    if P1.score >= 20:
+        pygame.mixer.music.pause()
+
+        font = pygame.font.Font("freesansbold.ttf", 20)
+        text = font.render("Você Ganhou", True, (255, 255, 255), (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (WIDTH // 2, HEIGHT // 2)
+        displaysurface.blit(text, textRect)
+
         pygame.display.update()
-        time.sleep(1)
+        time.sleep(2)
         pygame.quit()
         sys.exit()
 
-    if P1.rect.top <= HEIGHT / 3:
-        P1.pos.y += abs(P1.vel.y)
-        for plat in platforms:
-            plat.rect.y += abs(P1.vel.y)
-            if plat.rect.top >= HEIGHT:
-                plat.kill()
+    if pygame.sprite.spritecollideany(P1, E1):
+        pygame.mixer.music.pause()
 
-        for coin in coins:
-            coin.rect.y += abs(P1.vel.y)
-            if coin.rect.top >= HEIGHT:
-                coin.kill()
+        P1.kill()
+        font = pygame.font.Font("freesansbold.ttf", 20)
+        text = font.render("Game Over", True, (255, 255, 255), (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (WIDTH // 2, HEIGHT // 2)
+        displaysurface.blit(text, textRect)
 
-    generate_platform()
-    displaysurface.blit(background, (0, 0))
-    f = pygame.font.SysFont("Verdana", 20)
-    g = f.render(str(P1.score), True, (123, 255, 0))
-    displaysurface.blit(g, (WIDTH/2, 10))
+        pygame.display.update()
+        time.sleep(2)
+        pygame.quit()
+        sys.exit()
 
-    for entity in all_sprites:
-        displaysurface.blit(entity.surf, entity.rect)
-        entity.move()
-
-    for coin in coins:
-        displaysurface.blit(coin.image, coin.rect)
-        coin.update()
-
-    P1.draw()
+    displaysurface.blit(P1.surf, P1.rect)
 
     pygame.display.update()
     FramePerSec.tick(FPS)
