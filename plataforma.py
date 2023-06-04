@@ -23,7 +23,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         # self.image = pygame.image.load("character.png")
-        self.surf = pygame.Surface((30, 30))
+        self.surf = pygame.image.load("snowman.png")
         self.surf.fill((255, 255, 0))
         self.rect = self.surf.get_rect()
 
@@ -90,6 +90,10 @@ class platform(pygame.sprite.Sprite):
         self.point = True
         self.moving = True
 
+    def generateCoin(self):
+        if (self.speed == 0):
+            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+
     def move(self):
         # fix do erro do P1 nao seguir a plat que move
         hits = self.rect.colliderect(P1.rect)
@@ -107,7 +111,7 @@ class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
 
-        self.image = pygame.image.load("coin.png")
+        self.image = pygame.image.load("Coin.png")
         self.rect = self.image.get_rect()
 
         self.rect.topleft = pos
@@ -116,10 +120,6 @@ class Coin(pygame.sprite.Sprite):
         if self.rect.colliderect(P1.rect):
             P1.score += 5
             self.kill()
-
-    def generateCoin(self):
-        if (self.speed == 0):
-            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
 
 
 def check(platform, groupies):
