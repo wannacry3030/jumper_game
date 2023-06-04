@@ -91,12 +91,31 @@ class platform(pygame.sprite.Sprite):
         self.moving = True
 
     def move(self):
+        # fix do erro do P1 nao seguir a plat que move
+        hits = self.rect.colliderect(P1.rect)
         if self.moving == True:
             self.rect.move_ip(self.speed, 0)
+            if hits:
+                P1.pos += (self.speed, 0)
             if self.speed > 0 and self.rect.left > WIDTH:
                 self.rect.right = 0
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
+
+
+class coin(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+
+        self.image = pygame.image.load("coin.png")
+        self.rect = self.image.get_rect()
+
+        self.rect.topleft = pos
+
+    def update(self):
+        if self.rect.colliderect(P1.rect):
+            P1.score += 5
+            self.kill()
 
 
 def check(platform, groupies):
