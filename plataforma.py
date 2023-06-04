@@ -78,17 +78,39 @@ class Player(pygame.sprite.Sprite):
                     self.jumping = False
 
 
-class platform(pygame.sprite.Sprite):
-    def __init__(self):
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, pos):
         super().__init__()
-        self.surf = pygame.Surface((random.randint(50, 100), 12))
-        self.surf.fill((0, 255, 0))
+
+        self.image = pygame.image.load("Coin.png")
+        self.rect = self.image.get_rect()
+
+        self.rect.topleft = pos
+
+    def update(self):
+        if self.rect.colliderect(P1.rect):
+            P1.score += 5
+            self.kill()
+
+
+class platform(pygame.sprite.Sprite):
+    def __init__(self, width=0, height=18):
+        super().__init__()
+
+        if width == 0:
+            width = random.randint(50, 120)
+
+        self.image = pygame.image.load("platform.png")
+        self.surf = pygame.transform.scale(self.image, (width, height))
         self.rect = self.surf.get_rect(center=(random.randint(0, WIDTH-10),
                                                random.randint(0, HEIGHT-30)))
-        self.speed = random.randint(-1, 1)
 
         self.point = True
         self.moving = True
+        self.speed = random.randint(-1, 1)
+
+        if (self.speed == 0):
+            self.moving == False
 
     def generateCoin(self):
         if (self.speed == 0):
@@ -105,21 +127,6 @@ class platform(pygame.sprite.Sprite):
                 self.rect.right = 0
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
-
-
-class Coin(pygame.sprite.Sprite):
-    def __init__(self, pos):
-        super().__init__()
-
-        self.image = pygame.image.load("Coin.png")
-        self.rect = self.image.get_rect()
-
-        self.rect.topleft = pos
-
-    def update(self):
-        if self.rect.colliderect(P1.rect):
-            P1.score += 5
-            self.kill()
 
 
 def check(platform, groupies):
@@ -152,6 +159,7 @@ def plat_gen():
 
 PT1 = platform()
 P1 = Player()
+background = pygame.image.load("background.png")
 
 PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
@@ -215,7 +223,7 @@ while True:
                 plat.kill()
 
     plat_gen()
-    displaysurface.fill((0, 0, 0))
+    displaysurface.blit(background, (0, 0))
     f = pygame.font.SysFont("Verdana", 20)
     g = f.render(str(P1.score), True, (123, 255, 0))
     displaysurface.blit(g, (WIDTH/2, 10))
