@@ -156,6 +156,8 @@ all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
 all_sprites.add(P1)
 
+coins = pygame.sprite.Group()
+
 platforms = pygame.sprite.Group()
 platforms.add(PT1)
 
