@@ -96,33 +96,6 @@ class Player(pygame.sprite.Sprite):
         displaysurface.blit(self.surf, self.rect)
 
 
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image.load("enemy.png")
-        self.rect = self.image.get_rect()
-
-        self.pos = vec((random.randint(50, WIDTH - 50),
-                       random.randint(50, HEIGHT - 50)))
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-
-        # escolhe uma direção aleatoria pra ir
-        self.direction = random.choice([-1, 1])
-        self.speed = random.randint(2, 4)  # vel aleatoria
-
-    def update(self):
-        self.acc.x = self.speed * self.direction
-
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-
-        if self.pos.x < 0 or self.pos.x > WIDTH:
-            self.direction *= -1  # inverte a direção ao atingir uma borda
-
-        self.rect.center = self.pos
-
-
 class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
