@@ -128,9 +128,9 @@ class Enemy(pygame.sprite.Sprite):
                 game_over = True
                 P1.pos.x += self.speed
             if self.speed > 0 and self.rect.left > WIDTH:
-                self.kill()  # Remove o morcego se estiver fora da tela à direita
+                self.kill()
             if self.speed < 0 and self.rect.right < 0:
-                self.kill()  # Remove o morcego se estiver fora da tela à esquerda
+                self.kill()
 
     def update_image(self):
         # Scale the image using the original dimensions
