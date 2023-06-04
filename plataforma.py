@@ -86,8 +86,15 @@ class platform(pygame.sprite.Sprite):
                                                random.randint(0, HEIGHT-30)))
         self.moving = True
         self.point = True
+        self.speed = random.randint(-1, 1)
 
     def move(self):
+        if self.moving == True:
+            self.rect.move_ip(self.speed, 0)
+            if self.speed > 0 and self.rect.left > WIDTH:
+                self.rect.right = 0
+            if self.speed < 0 and self.rect.right < 0:
+                self.rect.left = WIDTH
         pass
 
 
