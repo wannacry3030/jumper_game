@@ -150,32 +150,35 @@ def plat_gen():
         while C:
             p = platform()
             p.rect.center = (random.randrange(0, WIDTH - width),
-                             random.randrange(-50, 0))
+                             random.randrange
+                             (-50, 0))
             C = check(p, platforms)
-            p.generateCoin()
+
+        p.generateCoin()
         platforms.add(p)
         all_sprites.add(p)
 
 
-PT1 = platform()
-P1 = Player()
-background = pygame.image.load("background.png")
-
-PT1.surf = pygame.Surface((WIDTH, 20))
-PT1.surf.fill((255, 0, 0))
-PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
-
 all_sprites = pygame.sprite.Group()
-all_sprites.add(PT1)
-all_sprites.add(P1)
-
+platforms = pygame.sprite.Group()
 coins = pygame.sprite.Group()
 
-platforms = pygame.sprite.Group()
-platforms.add(PT1)
+PT1 = platform(450, 80)
 
+
+background = pygame.image.load("background.png")
+PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
+# PT1.surf = pygame.Surface((WIDTH, 20))
+# PT1.surf.fill((255, 0, 0))
 PT1.moving = False
 PT1.point = False
+
+P1 = Player()
+
+all_sprites.add(PT1)
+all_sprites.add(P1)
+platforms.add(PT1)
+
 
 for x in range(random.randint(4, 5)):
     C = True
@@ -201,10 +204,6 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
-    for coin in coins:
-        displaysurface.blit(coin.image, coin.rect)
-        coin.update()
-
     if P1.rect.top > HEIGHT:
         for entity in all_sprites:
             entity.kill()
@@ -221,6 +220,11 @@ while True:
             plat.rect.y += abs(P1.vel.y)
             if plat.rect.top >= HEIGHT:
                 plat.kill()
+
+        for coin in coins:
+            coin.rect.y += abs(P1.vel.y)
+            if coin.rect.top >= HEIGHT:
+                coin.kill()
 
     plat_gen()
     displaysurface.blit(background, (0, 0))
