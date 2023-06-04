@@ -5,7 +5,7 @@ import random
 import time
 
 pygame.init()
-vec = pygame.math.Vector2
+vec = pygame.math.Vector2  # 2 for two dimensional
 
 HEIGHT = 450
 WIDTH = 400
@@ -22,6 +22,7 @@ pygame.display.set_caption("Game")
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        # self.image = pygame.image.load("character.png")
         self.surf = pygame.Surface((30, 30))
         self.surf.fill((255, 255, 0))
         self.rect = self.surf.get_rect()
@@ -65,15 +66,15 @@ class Player(pygame.sprite.Sprite):
                 self.vel.y = -3
 
     def update(self):
-        hits = pygame.sprite.spritecollide(P1, platforms, False)
-        if P1.vel.y > 0:
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if self.vel.y > 0:
             if hits:
                 if self.pos.y < hits[0].rect.bottom:
                     if hits[0].point == True:
                         hits[0].point = False
                         self.score += 1
-                    self.vel.y = 0
                     self.pos.y = hits[0].rect.top + 1
+                    self.vel.y = 0
                     self.jumping = False
 
 
@@ -84,9 +85,10 @@ class platform(pygame.sprite.Sprite):
         self.surf.fill((0, 255, 0))
         self.rect = self.surf.get_rect(center=(random.randint(0, WIDTH-10),
                                                random.randint(0, HEIGHT-30)))
-        self.moving = True
-        self.point = True
         self.speed = random.randint(-1, 1)
+
+        self.point = True
+        self.moving = True
 
     def move(self):
         if self.moving == True:
@@ -95,7 +97,6 @@ class platform(pygame.sprite.Sprite):
                 self.rect.right = 0
             if self.speed < 0 and self.rect.right < 0:
                 self.rect.left = WIDTH
-        pass
 
 
 def check(platform, groupies):
@@ -105,9 +106,9 @@ def check(platform, groupies):
         for entity in groupies:
             if entity == platform:
                 continue
-            if (abs(platform.rect.top - entity.rect.bottom) < 50) and (abs(platform.rect.bottom - entity.rect.top) < 50):
+            if (abs(platform.rect.top - entity.rect.bottom) < 40) and (abs(platform.rect.bottom - entity.rect.top) < 40):
                 return True
-            C = False
+        C = False
 
 
 def plat_gen():
@@ -118,10 +119,9 @@ def plat_gen():
 
         while C:
             p = platform()
-            p.rect.center = (random.randrange(
-                0, WIDTH - width), random.randrange(-50, 0))
+            p.rect.center = (random.randrange(0, WIDTH - width),
+                             random.randrange(-50, 0))
             C = check(p, platforms)
-
         platforms.add(p)
         all_sprites.add(p)
 
@@ -132,8 +132,6 @@ P1 = Player()
 PT1.surf = pygame.Surface((WIDTH, 20))
 PT1.surf.fill((255, 0, 0))
 PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
-PT1.moving = False
-PT1.point = False
 
 all_sprites = pygame.sprite.Group()
 all_sprites.add(PT1)
@@ -141,6 +139,9 @@ all_sprites.add(P1)
 
 platforms = pygame.sprite.Group()
 platforms.add(PT1)
+
+PT1.moving = False
+PT1.point = False
 
 for x in range(random.randint(4, 5)):
     C = True
@@ -150,6 +151,7 @@ for x in range(random.randint(4, 5)):
         C = check(pl, platforms)
     platforms.add(pl)
     all_sprites.add(pl)
+
 
 while True:
     P1.update()
@@ -164,13 +166,6 @@ while True:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
 
-    if P1.rect.top <= HEIGHT / 3:
-        P1.pos.y += abs(P1.vel.y)
-        for plat in platforms:
-            plat.rect.y += abs(P1.vel.y)
-            if plat.rect.top >= HEIGHT:
-                plat.kill()
-
     if P1.rect.top > HEIGHT:
         for entity in all_sprites:
             entity.kill()
@@ -179,7 +174,14 @@ while True:
             pygame.display.update()
             time.sleep(1)
             pygame.quit()
-            sys.exit
+            sys.exit()
+
+    if P1.rect.top <= HEIGHT / 3:
+        P1.pos.y += abs(P1.vel.y)
+        for plat in platforms:
+            plat.rect.y += abs(P1.vel.y)
+            if plat.rect.top >= HEIGHT:
+                plat.kill()
 
     plat_gen()
     displaysurface.fill((0, 0, 0))
