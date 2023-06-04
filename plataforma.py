@@ -24,7 +24,6 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # self.image = pygame.image.load("character.png")
         self.surf = pygame.image.load("snowman.png")
-        self.surf.fill((255, 255, 0))
         self.rect = self.surf.get_rect()
 
         self.pos = vec((10, 360))
@@ -235,6 +234,10 @@ while True:
     for entity in all_sprites:
         displaysurface.blit(entity.surf, entity.rect)
         entity.move()
+
+    for coin in coins:
+        displaysurface.blit(coin.image, coin.rect)
+        coin.update()
 
     pygame.display.update()
     FramePerSec.tick(FPS)
