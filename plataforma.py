@@ -103,7 +103,7 @@ class platform(pygame.sprite.Sprite):
                 self.rect.left = WIDTH
 
 
-class coin(pygame.sprite.Sprite):
+class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
 
@@ -116,6 +116,10 @@ class coin(pygame.sprite.Sprite):
         if self.rect.colliderect(P1.rect):
             P1.score += 5
             self.kill()
+
+    def generateCoin(self):
+        if (self.speed == 0):
+            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
 
 
 def check(platform, groupies):
@@ -141,6 +145,7 @@ def plat_gen():
             p.rect.center = (random.randrange(0, WIDTH - width),
                              random.randrange(-50, 0))
             C = check(p, platforms)
+            p.generateCoin()
         platforms.add(p)
         all_sprites.add(p)
 
@@ -170,6 +175,7 @@ for x in range(random.randint(4, 5)):
     while C:
         pl = platform()
         C = check(pl, platforms)
+    pl.generateCoin()
     platforms.add(pl)
     all_sprites.add(pl)
 
@@ -186,6 +192,10 @@ while True:
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 P1.cancel_jump()
+
+    for coin in coins:
+        displaysurface.blit(coin.image, coin.rect)
+        coin.update()
 
     if P1.rect.top > HEIGHT:
         for entity in all_sprites:
