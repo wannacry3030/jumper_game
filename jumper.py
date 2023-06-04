@@ -28,13 +28,17 @@ pygame.display.set_caption("mago legal")
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.surf = pygame.image.load("snowman.png")
+        self.surf_left = pygame.image.load("snowman_left.png")
+        self.surf_right = pygame.image.load("snowman_right.png")
+        self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
         self.rect = self.surf.get_rect()
+
         self.pos = vec((10, 360))
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.jumping = False
         self.score = 0
+        self.direction = "right"  # Inicialmente, o personagem está voltado para a direita
 
     def move(self):
         self.acc = vec(0, 0.5)
@@ -43,8 +47,12 @@ class Player(pygame.sprite.Sprite):
 
         if pressed_keys[K_LEFT]:
             self.acc.x = -ACC
+            # Altera a direção para "left" quando a tecla "left" é pressionada
+            self.direction = "left"
         if pressed_keys[K_RIGHT]:
             self.acc.x = ACC
+            # Altera a direção para "right" quando a tecla "right" é pressionada
+            self.direction = "right"
 
         self.acc.x += self.vel.x * FRIC
         self.vel += self.acc
@@ -73,19 +81,28 @@ class Player(pygame.sprite.Sprite):
         if self.vel.y > 0:
             if hits:
                 if self.pos.y < hits[0].rect.bottom:
-                    if hits[0].point == True:
+                    if hits[0].point:
                         hits[0].point = False
                         self.score += 1
                     self.pos.y = hits[0].rect.top + 1
                     self.vel.y = 0
                     self.jumping = False
 
+    def draw(self):
+        if self.direction == "left":
+            self.surf = self.surf_left
+        elif self.direction == "right":
+            self.surf = self.surf_right
+        displaysurface.blit(self.surf, self.rect)
+
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
+
         self.image = pygame.image.load("Coin.png")
         self.rect = self.image.get_rect()
+
         self.rect.topleft = pos
 
     def update(self):
@@ -94,7 +111,7 @@ class Coin(pygame.sprite.Sprite):
             self.kill()
 
 
-class Platform(pygame.sprite.Sprite):
+class platform(pygame.sprite.Sprite):
     def __init__(self, width=0, height=18):
         super().__init__()
 
@@ -113,7 +130,7 @@ class Platform(pygame.sprite.Sprite):
         if self.speed == 0:
             self.moving = False
 
-    def generate_coin(self):
+    def generateCoin(self):
         if self.speed == 0:
             coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
 
@@ -138,22 +155,22 @@ def check(platform, groupies):
                 continue
             if (abs(platform.rect.top - entity.rect.bottom) < 40) and (abs(platform.rect.bottom - entity.rect.top) < 40):
                 return True
-    return False
+        return False
 
 
 def plat_gen():
     while len(platforms) < 6:
         width = random.randrange(50, 100)
-        p = Platform()
+        p = platform()
         C = True
 
         while C:
-            p = Platform()
+            p = platform()
             p.rect.center = (random.randrange(0, WIDTH - width),
                              random.randrange(-50, 0))
             C = check(p, platforms)
 
-        p.generate_coin()
+        p.generateCoin()
         platforms.add(p)
         all_sprites.add(p)
 
@@ -162,7 +179,7 @@ all_sprites = pygame.sprite.Group()
 platforms = pygame.sprite.Group()
 coins = pygame.sprite.Group()
 
-PT1 = Platform(450, 80)
+PT1 = platform(450, 80)
 
 background = pygame.image.load("background.png")
 PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
@@ -177,11 +194,11 @@ platforms.add(PT1)
 
 for x in range(random.randint(4, 5)):
     C = True
-    pl = Platform()
+    pl = platform()
     while C:
-        pl = Platform()
+        pl = platform()
         C = check(pl, platforms)
-    pl.generate_coin()
+    pl.generateCoin()
     platforms.add(pl)
     all_sprites.add(pl)
 
@@ -201,12 +218,12 @@ while True:
     if P1.rect.top > HEIGHT:
         for entity in all_sprites:
             entity.kill()
-            time.sleep(1)
-            displaysurface.fill((255, 0, 0))
-            pygame.display.update()
-            time.sleep(1)
-            pygame.quit()
-            sys.exit()
+        time.sleep(1)
+        displaysurface.fill((255, 0, 0))
+        pygame.display.update()
+        time.sleep(1)
+        pygame.quit()
+        sys.exit()
 
     if P1.rect.top <= HEIGHT / 3:
         P1.pos.y += abs(P1.vel.y)
@@ -233,6 +250,8 @@ while True:
     for coin in coins:
         displaysurface.blit(coin.image, coin.rect)
         coin.update()
+
+    P1.draw()
 
     pygame.display.update()
     FramePerSec.tick(FPS)
