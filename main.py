@@ -29,71 +29,85 @@ pygame.display.set_caption("mago legal")
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+
+        # Carrega as imagens do personagem voltado para a esquerda e para a direita
         self.surf_left = pygame.image.load("assets/mage_left.png")
         self.surf_right = pygame.image.load("assets/mage_right.png")
         self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
-        self.rect = self.surf.get_rect()
 
-        self.pos = vec((10, 360))
-        self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
-        self.jumping = False
-        self.score = 0
+        self.rect = self.surf.get_rect()  # Obtém o retângulo da imagem do personagem
+
+        self.pos = vec((10, 360))  # Posição inicial do personagem
+        self.vel = vec(0, 0)  # Velocidade inicial do personagem
+        self.acc = vec(0, 0)  # Aceleração inicial do personagem
+        self.jumping = False  # Variável para controlar se o personagem está pulando
+        self.score = 0  # Pontuação do jogador
         self.direction = "right"  # Inicialmente, o personagem está voltado para a direita
 
     def move(self):
-        self.acc = vec(0, 0.5)
+        self.acc = vec(0, 0.5)  # Define a aceleração vertical do personagem
 
+        # Obtém o estado das teclas pressionadas
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[K_LEFT]:
+            # Define a aceleração horizontal negativa quando a tecla "left" é pressionada
             self.acc.x = -ACC
             # Altera a direção para "left" quando a tecla "left" é pressionada
             self.direction = "left"
+
         if pressed_keys[K_RIGHT]:
+            # Define a aceleração horizontal positiva quando a tecla "right" é pressionada
             self.acc.x = ACC
             # Altera a direção para "right" quando a tecla "right" é pressionada
             self.direction = "right"
 
-        self.acc.x += self.vel.x * FRIC
-        self.vel += self.acc
+        self.acc.x += self.vel.x * FRIC  # Aplica atrito à aceleração horizontal
+        self.vel += self.acc  # Atualiza a velocidade com base na aceleração
+        # Atualiza a posição com base na velocidade e aceleração
         self.pos += self.vel + 0.5 * self.acc
 
+        # Limita a posição do personagem dentro dos limites da tela
         if self.pos.x > WIDTH:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = WIDTH
 
+        # Atualiza a posição do retângulo da imagem do personagem
         self.rect.midbottom = self.pos
 
     def jump(self):
+        # Verifica colisões entre o personagem e as plataformas
         hits = pygame.sprite.spritecollide(self, platforms, False)
         if hits and not self.jumping:
-            self.jumping = True
-            self.vel.y = -15
+            self.jumping = True  # Define que o personagem está pulando
+            self.vel.y = -15  # Define a velocidade vertical negativa para o pulo
 
     def cancel_jump(self):
         if self.jumping:
             if self.vel.y < -3:
-                self.vel.y = -3
+                self.vel.y = -3  # Define uma velocidade vertical mínima durante o pulo
 
     def update(self):
+        # Verifica colisões entre o personagem e as plataformas
         hits = pygame.sprite.spritecollide(self, platforms, False)
-        if self.vel.y > 0:
+        if self.vel.y > 0:  # Verifica se o personagem está descendo
             if hits:
                 if self.pos.y < hits[0].rect.bottom:
                     if hits[0].point:
                         hits[0].point = False
-                        self.score += 1
+                        self.score += 1  # Incrementa a pontuação quando o personagem passa por uma plataforma
+                    # Reposiciona o personagem no topo da plataforma
                     self.pos.y = hits[0].rect.top + 1
-                    self.vel.y = 0
-                    self.jumping = False
+                    self.vel.y = 0  # Define a velocidade vertical como zero
+                    self.jumping = False  # Define que o personagem não está mais pulando
 
     def draw(self):
         if self.direction == "left":
-            self.surf = self.surf_left
+            self.surf = self.surf_left  # Usa a imagem voltada para a esquerda
         elif self.direction == "right":
-            self.surf = self.surf_right
+            self.surf = self.surf_right  # Usa a imagem voltada para a direita
+        # Desenha a imagem do personagem na tela
         displaysurface.blit(self.surf, self.rect)
 
 
