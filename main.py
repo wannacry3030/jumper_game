@@ -101,9 +101,10 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, width=43, height=28):
         super().__init__()
 
-        self.original_image = pygame.image.load("assets/batleft.gif")
-        self.surf = pygame.transform.scale(
-            self.original_image, (width, height))
+        self.surf_left = pygame.image.load("assets/enemy_right.png")
+        self.surf_right = pygame.image.load("assets/enemy_left.png")
+        # Inicialmente, carrega a imagem do morcego virado para a esquerda
+        self.surf = self.surf_left
         self.rect = self.surf.get_rect()
 
         # Set the initial x position on either the left or right side of the screen
@@ -132,10 +133,15 @@ class Enemy(pygame.sprite.Sprite):
             if self.speed < 0 and self.rect.right < 0:
                 self.kill()
 
+        self.update_image()
+
     def update_image(self):
-        # Scale the image using the original dimensions
+        if self.speed > 0:
+            self.surf = self.surf_right
+        else:
+            self.surf = self.surf_left
         self.surf = pygame.transform.scale(
-            self.original_image, (self.rect.width, self.rect.height))
+            self.surf, (self.rect.width, self.rect.height))
 
 
 class Coin(pygame.sprite.Sprite):
@@ -248,7 +254,7 @@ for x in range(random.randint(4, 5)):
     all_sprites.add(pl)
 
 # Tempo inicial para o próximo spawn de inimigo
-enemy_spawn_time = pygame.time.get_ticks() + random.randint(2000, 5000)
+enemy_spawn_time = pygame.time.get_ticks() + random.randint(3000, 6000)
 game_over = False
 
 while not game_over:
@@ -295,7 +301,7 @@ while not game_over:
                 coin.kill()
 
     if pygame.time.get_ticks() > enemy_spawn_time:
-        enemy_spawn_time = pygame.time.get_ticks() + random.randint(2000, 5000)
+        enemy_spawn_time = pygame.time.get_ticks() + random.randint(3000, 6000)
         E = Enemy()
         all_sprites.add(E)
         enemies.add(E)  # Adicionar o objeto Enemy ao grupo de inimigos
