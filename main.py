@@ -29,8 +29,8 @@ pygame.display.set_caption("mago legal")
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.surf_left = pygame.image.load("assets/snowman_left.png")
-        self.surf_right = pygame.image.load("assets/snowman_right.png")
+        self.surf_left = pygame.image.load("assets/mage_left.png")
+        self.surf_right = pygame.image.load("assets/mage_right.png")
         self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
         self.rect = self.surf.get_rect()
 
