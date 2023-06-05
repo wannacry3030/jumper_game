@@ -5,25 +5,27 @@ import random
 import time
 import pygame.mixer
 
-pygame.init()
-pygame.mixer.init()
-pygame.mixer.music.load("assets/music.mp3")
-pygame.mixer.music.set_volume(0.2)
-pygame.mixer.music.play(-1)
+pygame.init()  # Inicializa o Pygame
+pygame.mixer.init()  # Inicializa o mixer do Pygame para reprodução de áudio
+pygame.mixer.music.load("assets/music.mp3")  # Carrega a música de fundo
+pygame.mixer.music.set_volume(0.2)  # Define o volume da música
+pygame.mixer.music.play(-1)  # Reproduz a música em loop
 
-vec = pygame.math.Vector2  # 2 for two dimensional
+vec = pygame.math.Vector2  # Vetor 2D para cálculos de física
 
-HEIGHT = 450
-WIDTH = 400
-ACC = 0.5
-FRIC = -0.12
-FPS = 60
-game_over = False
+HEIGHT = 450  # Altura da tela
+WIDTH = 400  # Largura da tela
+ACC = 0.5  # Aceleração do jogador
+FRIC = -0.12  # Coeficiente de atrito para desacelerar o jogador
+FPS = 60  # Taxa de quadros por segundo
+game_over = False  # Variável para verificar se o jogo acabou
 
+# Relógio para controlar a taxa de quadros por segundo
 FramePerSec = pygame.time.Clock()
 
-displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("mago legal")
+displaysurface = pygame.display.set_mode(
+    (WIDTH, HEIGHT))  # Cria a superfície de exibição
+pygame.display.set_caption("mago legal")  # Define o título da janela do jogo
 
 
 class Player(pygame.sprite.Sprite):
