@@ -4,27 +4,14 @@ import sys
 import random
 import time
 import pygame.mixer
-import imageio
-
-from player import Player
-from enemy import Enemy
-from coin import Coin
-from platforma import Platform
-
-# Código principal do jogo...
-import pygame
-from pygame.locals import *
-import sys
-import random
-import time
-import pygame.mixer
 
 pygame.init()
 pygame.mixer.init()
-pygame.mixer.music.load("music.mp3")
+pygame.mixer.music.load("assets/music.mp3")
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1)
 
+vec = pygame.math.Vector2  # 2 for two dimensional
 
 HEIGHT = 450
 WIDTH = 400
@@ -37,6 +24,168 @@ FramePerSec = pygame.time.Clock()
 
 displaysurface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("mago legal")
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.surf_left = pygame.image.load("assets/snowman_left.png")
+        self.surf_right = pygame.image.load("assets/snowman_right.png")
+        self.surf = self.surf_right  # Inicialmente, carrega a imagem voltada para a direita
+        self.rect = self.surf.get_rect()
+
+        self.pos = vec((10, 360))
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.jumping = False
+        self.score = 0
+        self.direction = "right"  # Inicialmente, o personagem está voltado para a direita
+
+    def move(self):
+        self.acc = vec(0, 0.5)
+
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[K_LEFT]:
+            self.acc.x = -ACC
+            # Altera a direção para "left" quando a tecla "left" é pressionada
+            self.direction = "left"
+        if pressed_keys[K_RIGHT]:
+            self.acc.x = ACC
+            # Altera a direção para "right" quando a tecla "right" é pressionada
+            self.direction = "right"
+
+        self.acc.x += self.vel.x * FRIC
+        self.vel += self.acc
+        self.pos += self.vel + 0.5 * self.acc
+
+        if self.pos.x > WIDTH:
+            self.pos.x = 0
+        if self.pos.x < 0:
+            self.pos.x = WIDTH
+
+        self.rect.midbottom = self.pos
+
+    def jump(self):
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if hits and not self.jumping:
+            self.jumping = True
+            self.vel.y = -15
+
+    def cancel_jump(self):
+        if self.jumping:
+            if self.vel.y < -3:
+                self.vel.y = -3
+
+    def update(self):
+        hits = pygame.sprite.spritecollide(self, platforms, False)
+        if self.vel.y > 0:
+            if hits:
+                if self.pos.y < hits[0].rect.bottom:
+                    if hits[0].point:
+                        hits[0].point = False
+                        self.score += 1
+                    self.pos.y = hits[0].rect.top + 1
+                    self.vel.y = 0
+                    self.jumping = False
+
+    def draw(self):
+        if self.direction == "left":
+            self.surf = self.surf_left
+        elif self.direction == "right":
+            self.surf = self.surf_right
+        displaysurface.blit(self.surf, self.rect)
+
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, width=43, height=28):
+        super().__init__()
+
+        self.original_image = pygame.image.load("assets/batleft.gif")
+        self.surf = pygame.transform.scale(
+            self.original_image, (width, height))
+        self.rect = self.surf.get_rect()
+
+        # Set the initial x position on either the left or right side of the screen
+        if random.choice([True, False]):
+            self.rect.left = 0
+            self.speed = random.randint(1, 3)
+        else:
+            self.rect.right = WIDTH
+            self.speed = random.randint(-3, -1)
+
+        self.rect.centery = random.randint(0, HEIGHT - 30)
+
+        self.point = True
+        self.moving = True
+
+    def move(self):
+        hits = self.rect.colliderect(P1.rect)
+        if self.moving:
+            self.rect.move_ip(self.speed, 0)
+            if hits:
+                global game_over
+                game_over = True
+                P1.pos.x += self.speed
+            if self.speed > 0 and self.rect.left > WIDTH:
+                self.kill()
+            if self.speed < 0 and self.rect.right < 0:
+                self.kill()
+
+    def update_image(self):
+        # Scale the image using the original dimensions
+        self.surf = pygame.transform.scale(
+            self.original_image, (self.rect.width, self.rect.height))
+
+
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+
+        self.image = pygame.image.load("assets/Coin.png")
+        self.rect = self.image.get_rect()
+
+        self.rect.topleft = pos
+
+    def update(self):
+        if self.rect.colliderect(P1.rect):
+            P1.score += 5
+            self.kill()
+
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, width=0, height=18):
+        super().__init__()
+
+        if width == 0:
+            width = random.randint(50, 120)
+
+        self.image = pygame.image.load("assets/platform.png")
+        self.surf = pygame.transform.scale(self.image, (width, height))
+        self.rect = self.surf.get_rect(
+            center=(random.randint(0, WIDTH-10), random.randint(0, HEIGHT-30)))
+
+        self.point = True
+        self.moving = True
+        self.speed = random.randint(-1, 1)
+
+        if self.speed == 0:
+            self.moving = False
+
+    def generateCoin(self):
+        if self.speed == 0:
+            coins.add(Coin((self.rect.centerx, self.rect.centery - 50)))
+
+    def move(self):
+        hits = self.rect.colliderect(P1.rect)
+        if self.moving:
+            self.rect.move_ip(self.speed, 0)
+            if hits:
+                P1.pos += (self.speed, 0)
+            if self.speed > 0 and self.rect.left > WIDTH:
+                self.rect.right = 0
+            if self.speed < 0 and self.rect.right < 0:
+                self.rect.left = WIDTH
 
 
 def check(platform, groupies):
@@ -75,7 +224,7 @@ enemies = pygame.sprite.Group()
 
 PT1 = Platform(450, 80)
 
-background = pygame.image.load("background.png")
+background = pygame.image.load("assets/background.png")
 PT1.rect = PT1.surf.get_rect(center=(WIDTH/2, HEIGHT - 10))
 PT1.moving = False
 PT1.point = False
